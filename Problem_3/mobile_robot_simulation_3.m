@@ -22,6 +22,7 @@ robotCurrentPose = [robotInitialLocation robotInitialOrientation]'; % [x; y; the
 % 시뮬레이션 파라미터 (최대 속도 변경)
 sampleTime = 0.1;
 RobotMaxVel = 1.0;         % 로봇 최대 선속도 (m/s) - 문제 3 요구사항
+RobotMinVel = 0.0;         % 로봇 최소 선속도 - 튜닝 가능
 vizRate = rateControl(1/sampleTime);
 
 % --- 제어기 파라미터 ---
@@ -82,7 +83,7 @@ while( distanceToGoal > goalRadius && idx_waypoints <= size(ref_traj, 1))
 
     % 6. 선속도 명령 계산 (v_cmd) - P 제어 및 Saturation (수정됨)
     v_cmd_raw = Kpv_linear * distanceToWaypoint; % P 제어
-    v_cmd = max(0, min(RobotMaxVel, v_cmd_raw));   % 속도 제한 (0 ~ RobotMaxVel)
+    v_cmd = max(RobotMinVel, min(RobotMaxVel, v_cmd_raw));   % 속도 제한 (0 ~ RobotMaxVel)
     % --------------------------------------
 
     % Waypoint 전환 로직 (거리 계산 위치 변경됨)
