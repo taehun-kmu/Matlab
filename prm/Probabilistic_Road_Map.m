@@ -10,6 +10,6 @@ prm = robotics.PRM(mapInflated);
 prm.NumNodes = 500;
 prm.ConnectionDistance = 10;
 startLocation = [4.0 2.0];
-endLocation = [48.0 38.0];
+endLocation = [48.0 35.0];
 path = findpath(prm, startLocation, endLocation);
 show(prm);
