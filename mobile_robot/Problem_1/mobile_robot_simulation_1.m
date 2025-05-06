@@ -130,8 +130,12 @@ end
 
 disp('Goal Reached!');
 
+time_vector = (0:length(error_history)-1) * sampleTime;
 figure(2);
-plot(error_history);
-title('Heading Error (e_{\theta}) over time');
-xlabel('Time step');
+plot(time_vector, error_history);
+title(['Heading Error (e_{\theta}) over time (Kp = ', num2str(Kp_angle), ')']);
+xlabel('Time (s)');
 ylabel('Error (rad)');
+grid on;
+
+save('P_Control.mat', 'robotPath', 'error_history');
