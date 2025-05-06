@@ -130,3 +130,5 @@ figure(2);
 plot(time_history(2:end), error_history); % 첫 번째 시간 제외
 title('Heading Error (e_{\theta}) over time (PI Controller)');
 xlabel('Time (s)'); ylabel('Error (rad)'); grid on;
+
+save('PI_Control.mat', 'robotPath', 'error_history', 'time_history');
