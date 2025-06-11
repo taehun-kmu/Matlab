@@ -8,31 +8,36 @@ simTime = 60;    % in seconds
 updateRate = 10;  % in Hz (increased from 5 to 10)
 scene = uavScenario('UpdateRate', updateRate, 'StopTime', simTime);
 
-% Floor
-addMesh(scene, 'polygon', {[0 0;200 0;200 200;100 200;100 100;0 100], [-1 0]}, [0.3 0.3 0.3]);
+% Floor - 완전한 직사각형으로 변경
+addMesh(scene, 'polygon', {[0 0;200 0;200 200;0 200], [-1 0]}, [0.3 0.3 0.3]);
 
-% Feature
-addMesh(scene, 'polygon', {[25 0;75 0;75 50;25 50], [0 80]}, [0.4660 0.6740 0.1880]);  % Building 1
-addMesh(scene, 'polygon', {[112 0;200 0;200 75;112 75], [0 120]}, [0.9290 0.6980 0.1250]);  % Building 2
-addMesh(scene, 'polygon', {[0 87;25 87;25 100;0 100], [0 10]}, [0 0.5 0]);                % Generator Room
-addMesh(scene, 'polygon', {[125 100;200 100;200 175;125 175], [0 10]}, [0 0.4470 0.7410]);      % Swimming Pool
-addMesh(scene, 'polygon', {[0 0;5 0;5 10;0 10], [0 6]}, [0.6350 0.0780 0.1840]);         % Security Room
+% 최적화된 빌딩 배치 (200x200m 범위 내, UAV 비행을 위한 80m+ 간격 확보)
+% 구역 1: 북서 (소형 빌딩 3개 - 20x20m, 높이 다양화: 25m, 30m, 35m)
+addMesh(scene, 'polygon', {[25 125;45 125;45 145;25 145], [0 25]}, [0.4660 0.6740 0.1880]);  % Building 1
+addMesh(scene, 'polygon', {[25 175;45 175;45 195;25 195], [0 30]}, [0.4660 0.6740 0.1880]);  % Building 2
+addMesh(scene, 'polygon', {[85 135;105 135;105 155;85 155], [0 35]}, [0.4660 0.6740 0.1880]);  % Building 3 (남쪽 15m 이동)
 
-% 추가 빌딩들 (RRT/RRT* 성능 테스트용)
-addMesh(scene, 'polygon', {[10 60;30 60;30 80;10 80], [0 40]}, [0.7 0.7 0.1]);    % Building 3 (New)
-addMesh(scene, 'polygon', {[80 10;100 10;100 30;80 30], [0 60]}, [0.1 0.7 0.7]);    % Building 4 (New)
-addMesh(scene, 'polygon', {[130 80;150 80;150 95;130 95], [0 30]}, [0.7 0.1 0.7]);    % Building 5 (New)
-addMesh(scene, 'polygon', {[105 110;120 110;120 140;105 140], [0 70]}, [0.5 0.5 0.5]); % Building 6 (New)
-addMesh(scene, 'polygon', {[170 10;190 10;190 30;170 30], [0 55]}, [0.9 0.5 0.1]);    % Building 7 (New)
-addMesh(scene, 'polygon', {[40 10;60 10;60 25;40 25], [0 20]}, [0.2 0.2 0.8]);       % Building 8 (New)
+% 구역 2: 북동 (중형 빌딩 3개 - 30x30m, 높이 다양화: 40m, 45m, 50m)
+addMesh(scene, 'polygon', {[125 125;155 125;155 155;125 155], [0 40]}, [0.9290 0.6980 0.1250]);  % Building 4
+addMesh(scene, 'polygon', {[175 125;195 125;195 155;175 155], [0 45]}, [0.9290 0.6980 0.1250]);  % Building 5 (동쪽 10m 이동)
+addMesh(scene, 'polygon', {[125 175;155 175;155 195;125 195], [0 50]}, [0.9290 0.6980 0.1250]);  % Building 6 (서쪽 25m 이동)
 
+% 구역 3: 남서 (대형 빌딩 2개 - 40x40m, 높이 다양화: 55m, 60m)
+addMesh(scene, 'polygon', {[25 25;65 25;65 65;25 65], [0 55]}, [0 0.4470 0.7410]);    % Building 7
+addMesh(scene, 'polygon', {[80 25;120 25;120 65;80 65], [0 60]}, [0 0.4470 0.7410]);  % Building 8 (동쪽 55m 이동)
+
+% 구역 4: 남동 (혼합 빌딩 4개 - 다양한 크기와 높이)
+addMesh(scene, 'polygon', {[125 25;145 25;145 45;125 45], [0 30]}, [0.6350 0.0780 0.1840]);    % Building 9 (소형, 30m)
+addMesh(scene, 'polygon', {[160 85;190 85;190 115;160 115], [0 45]}, [0.7 0.7 0.1]);           % Building 10 (중형, 45m) - 북동쪽 이동
+addMesh(scene, 'polygon', {[125 50;165 50;165 90;125 90], [0 65]}, [0.1 0.7 0.7]);             % Building 11 (대형, 65m) - 남쪽 25m 이동
+addMesh(scene, 'polygon', {[170 25;190 25;190 45;170 45], [0 35]}, [0.7 0.1 0.7]);             % Building 12 (소형, 35m) - 남쪽 50m 이동
 
 %% Create Mapping Trajectory
 % Simplified rectangular flight pattern
 x_simple = [0, 200, 200, 0, 0];
 y_simple = [0, 0, 200, 200, 0];
 num_waypoints = length(x_simple); % 새로운 웨이포인트 개수 (5개)
-z_simple = 150 * ones(1, num_waypoints); % 비행 고도는 150으로 유지
+z_simple = 80 * ones(1, num_waypoints); % 비행 고도를 80m로 조정 (빌딩 최고점 65m + 안전거리 15m)
 
 waypoints = [x_simple', y_simple', z_simple'];
 
